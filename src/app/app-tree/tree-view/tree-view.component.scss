@@ -1,0 +1,48 @@
+:host {
+  .example-tree ul,
+  .example-tree li {
+    margin-top: 0;
+    margin-bottom: 0;
+    list-style-type: none;
+  }
+
+  .node-option {
+    cursor: pointer;
+
+    &.active {
+      background-color: bisque;
+    }
+  }
+
+  .example-tree-node {
+    display: block;
+  }
+
+  .example-tree-node .example-tree-node {
+    padding-left: 40px;
+  }
+
+  .nested-node {
+    &.selected-group {
+      background-color: darkgray;
+    }
+  }
+
+  .children-container {
+    display: grid;
+    grid-template-rows:0fr;
+    transition: all .2s ease-in-out;
+
+    .expansion-content {
+      overflow: hidden;
+    }
+
+    &.expanded {
+      grid-template-rows: 1fr;
+    }
+  }
+}
+
+
+
+
