@@ -72,12 +72,16 @@ export class TreeViewComponent implements OnChanges {
   }
 
   isParentActive(node: ITreeNode): boolean {
-    if(!this.includeSubUnits){
-      if(this.isSelected(node)){
+    if (!this.includeSubUnits) {
+      if (this.isSelected(node)) {
         return true;
       }
     }
     return false;
+  }
+
+  isRootNode(node: ITreeNode): boolean {
+    return this._data.value.find(item => item.name === node.name) !== undefined;
   }
 
   hasChild = (_: number, node: ITreeNode) => !!node.children && node.children.length > 0;

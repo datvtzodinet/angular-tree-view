@@ -3,7 +3,8 @@
   <cdk-nested-tree-node *cdkTreeNodeDef="let node" class="example-tree-node">
     <!-- use a disabled button to provide padding for tree leaf -->
     <span class="node-option" [class.active]="isLeafActive(node)" (click)="handleNodeClicked(node)">
-    {{node.name}}
+      <i class="bi bi-archive"></i>
+      <span>{{node.name}}</span>
     </span>
   </cdk-nested-tree-node>
   <!-- This is the tree node template for expandable nodes -->
@@ -13,7 +14,8 @@
       <i [ngClass]="treeControl.isExpanded(node) ? 'bi bi-chevron-expand' : 'bi bi-arrows-collapse'"></i>
     </button>
     <span class="node-option" [class.active]="isParentActive(node)" (click)="handleNodeClicked(node)">
-    {{node.name}}
+      <i [ngClass]=" isRootNode(node) ? 'bi bi-buildings': 'bi bi-archive'"></i>
+      <span>{{node.name}}</span>
     </span>
     <div [class.expanded]="treeControl.isExpanded(node)" class="children-container">
       <div class="expansion-content">
