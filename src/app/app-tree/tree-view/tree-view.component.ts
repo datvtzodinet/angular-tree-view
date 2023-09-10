@@ -1,4 +1,4 @@
-import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
 import {ArrayDataSource} from '@angular/cdk/collections';
 import {NestedTreeControl} from '@angular/cdk/tree';
 import {TreeView} from "../models";
@@ -15,6 +15,10 @@ export class TreeViewComponent implements OnChanges {
   @Input() expandAll: boolean = true;
   @Input() data: ITreeNode[] = [];
   @Input() includeSubUnits: boolean = false;
+  @Input() title: string = 'Fruits & Vegetables';
+  @Input() showNavigation: boolean = false;
+  @Output() navigationCB: EventEmitter<void> = new EventEmitter();
+
   treeControl = new NestedTreeControl<ITreeNode>(node => node.children);
   dataSource!: ArrayDataSource<ITreeNode>;
 
@@ -86,6 +90,11 @@ export class TreeViewComponent implements OnChanges {
 
   hasChild = (_: number, node: ITreeNode) => !!node.children && node.children.length > 0;
 
+  handleNavigation(): void {
+    if (this.navigationCB) {
+      this.navigationCB.emit();
+    }
+  }
   private getData(): ITreeNode[] {
     return this._data.value;
   }

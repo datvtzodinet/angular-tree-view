@@ -1,4 +1,11 @@
 :host {
+  .header {
+    display: flex;
+    align-items: center;
+    i {
+      margin-left: 12px;
+    }
+  }
   .example-tree ul,
   .example-tree li {
     margin-top: 0;

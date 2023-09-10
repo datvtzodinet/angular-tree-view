@@ -38,4 +38,8 @@ export class AppComponent {
       console.log('selected node:', unit);
     });
   }
+
+  handleNavigation = (): void => {
+    console.log("handleNavigation");
+  }
 }

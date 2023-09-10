@@ -1,26 +1,36 @@
-<cdk-tree [dataSource]="dataSource" [treeControl]="treeControl">
-  <!-- This is the tree node template for leaf nodes -->
-  <cdk-nested-tree-node *cdkTreeNodeDef="let node" class="example-tree-node">
-    <!-- use a disabled button to provide padding for tree leaf -->
-    <span class="node-option" [class.active]="isLeafActive(node)" (click)="handleNodeClicked(node)">
+<section class="tree-root">
+  <div class="header">
+    <h2>{{title}}</h2>
+    <ng-container *ngIf="showNavigation">
+      <i (click)="handleNavigation()" class="bi bi-arrow-right-circle"></i>
+    </ng-container>
+  </div>
+  <cdk-tree [dataSource]="dataSource" [treeControl]="treeControl">
+    <!-- This is the tree node template for leaf nodes -->
+    <cdk-nested-tree-node *cdkTreeNodeDef="let node" class="example-tree-node">
+      <!-- use a disabled button to provide padding for tree leaf -->
+      <span class="node-option" [class.active]="isLeafActive(node)" (click)="handleNodeClicked(node)">
       <i class="bi bi-archive"></i>
       <span>{{node.name}}</span>
     </span>
-  </cdk-nested-tree-node>
-  <!-- This is the tree node template for expandable nodes -->
-  <cdk-nested-tree-node *cdkTreeNodeDef="let node; when: hasChild" class="example-tree-node nested-node"
-                        [class.selected-group]="isGroupActive(node)">
-    <button [attr.aria-label]="'Toggle ' + node.name" cdkTreeNodeToggle>
-      <i [ngClass]="treeControl.isExpanded(node) ? 'bi bi-chevron-expand' : 'bi bi-arrows-collapse'"></i>
-    </button>
-    <span class="node-option" [class.active]="isParentActive(node)" (click)="handleNodeClicked(node)">
+    </cdk-nested-tree-node>
+    <!-- This is the tree node template for expandable nodes -->
+    <cdk-nested-tree-node *cdkTreeNodeDef="let node; when: hasChild" class="example-tree-node nested-node"
+                          [class.selected-group]="isGroupActive(node)">
+      <button [attr.aria-label]="'Toggle ' + node.name" cdkTreeNodeToggle>
+        <i [ngClass]="treeControl.isExpanded(node) ? 'bi bi-chevron-expand' : 'bi bi-arrows-collapse'"></i>
+      </button>
+      <span class="node-option" [class.active]="isParentActive(node)" (click)="handleNodeClicked(node)">
       <i [ngClass]=" isRootNode(node) ? 'bi bi-buildings': 'bi bi-archive'"></i>
       <span>{{node.name}}</span>
     </span>
-    <div [class.expanded]="treeControl.isExpanded(node)" class="children-container">
-      <div class="expansion-content">
-        <ng-container cdkTreeNodeOutlet></ng-container>
+      <div [class.expanded]="treeControl.isExpanded(node)" class="children-container">
+        <div class="expansion-content">
+          <ng-container cdkTreeNodeOutlet></ng-container>
+        </div>
       </div>
-    </div>
-  </cdk-nested-tree-node>
-</cdk-tree>
+    </cdk-nested-tree-node>
+  </cdk-tree>
+</section>
+
+
