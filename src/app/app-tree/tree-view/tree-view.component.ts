@@ -1,17 +1,25 @@
-import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
-import {ArrayDataSource} from '@angular/cdk/collections';
-import {NestedTreeControl} from '@angular/cdk/tree';
+import {AfterViewInit, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
+import {FlatTreeControl} from '@angular/cdk/tree';
 import {TreeView} from "../models";
-import {BehaviorSubject, Observable} from "rxjs";
-import ITreeNode = TreeView.ITreeNode;
+import {MatTreeFlatDataSource, MatTreeFlattener} from "../flat-data-source";
+import {BehaviorSubject} from "rxjs";
 import {AppTreeService} from "../app-tree.service";
+import ITreeNode = TreeView.ITreeNode;
+
+/** Flat node with expandable and level information */
+interface ExampleFlatNode {
+  expandable: boolean;
+  name: string;
+  level: number;
+  parent?: string;
+}
 
 @Component({
   selector: 'app-tree-view',
   templateUrl: './tree-view.component.html',
   styleUrls: ['./tree-view.component.scss'],
 })
-export class TreeViewComponent implements OnChanges {
+export class TreeViewComponent implements OnChanges, AfterViewInit {
   @Input() expandAll: boolean = true;
   @Input() data: ITreeNode[] = [];
   @Input() includeSubUnits: boolean = false;
@@ -19,41 +27,54 @@ export class TreeViewComponent implements OnChanges {
   @Input() showNavigation: boolean = false;
   @Output() navigationCB: EventEmitter<void> = new EventEmitter();
 
-  treeControl = new NestedTreeControl<ITreeNode>(node => node.children);
-  dataSource!: ArrayDataSource<ITreeNode>;
 
-  private _data: BehaviorSubject<ITreeNode[]> = new BehaviorSubject<TreeView.ITreeNode[]>([]);
-  private selectedNode: BehaviorSubject<ITreeNode | undefined> = new BehaviorSubject<ITreeNode | undefined>(undefined);
+  dataSource!: MatTreeFlatDataSource<ITreeNode, ExampleFlatNode>;
+  private _transformer = (node: ITreeNode, level: number) => {
+    return {
+      expandable: !!node.children && node.children.length > 0,
+      name: node.name,
+      level: level,
+      parent: node.parent
+    } as ExampleFlatNode;
+  };
+  treeControl = new FlatTreeControl<ExampleFlatNode>(
+    node => node.level,
+    node => node.expandable,
+  );
+  treeFlattener = new MatTreeFlattener(
+    this._transformer,
+    node => node.level,
+    node => node.expandable,
+    node => node.children,
+  );
 
   constructor(private treeService: AppTreeService) {
-    this.dataSource = new ArrayDataSource<TreeView.ITreeNode>(this._data);
-    this._data.next(this.data);
-    this.treeControl.dataNodes = this.getData();
+    this.dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
+    this.dataSource.data = this.data;
+  }
+
+  ngAfterViewInit(): void {
     if (this.expandAll) {
       this.treeControl.expandAll();
     }
   }
+
+  hasChild = (_: number, node: ExampleFlatNode) => node.expandable;
+  private selectedNode: BehaviorSubject<ITreeNode | undefined> = new BehaviorSubject<ITreeNode | undefined>(undefined);
 
   ngOnChanges(changes: SimpleChanges): void {
     const {data}: SimpleChanges = changes;
     if (data) {
       if (data.currentValue) {
-        this.setDataSource(changes['data'].currentValue);
+        this.dataSource.data = this.data;
       } else {
-        this.setDataSource([]);
+        this.dataSource.data = [];
       }
     }
   }
 
-  setDataSource(data: ITreeNode[]) {
-    this._data.next(data);
-    this.treeControl.dataNodes = this.getData();
-    if (this.expandAll) {
-      this.treeControl.expandAll();
-    }
-  }
-
-  handleNodeClicked(node: ITreeNode): void {
+  handleNodeClicked(node: ExampleFlatNode): void {
+    console.log(node);
     if (this.isSelected(node)) {
       this.selectedNode.next(undefined);
       this.treeService.setSelectedUnit(undefined);
@@ -63,19 +84,21 @@ export class TreeViewComponent implements OnChanges {
     this.treeService.setSelectedUnit(node.name);
   }
 
-  isGroupActive(node: ITreeNode): boolean {
+
+  isGroupActive(node: ExampleFlatNode): boolean {
     return this.includeSubUnits && this.isSelected(node) && !this.isLeaf(node);
   }
 
-  isSelected(node: ITreeNode): boolean {
+  isSelected(node: ExampleFlatNode): boolean {
     return this.getSelectedNode()?.name === node.name;
   }
 
-  isLeafActive(node: ITreeNode): boolean {
+
+  isLeafActive(node: ExampleFlatNode): boolean {
     return this.isSelected(node);
   }
 
-  isParentActive(node: ITreeNode): boolean {
+  isParentActive(node: ExampleFlatNode): boolean {
     if (!this.includeSubUnits) {
       if (this.isSelected(node)) {
         return true;
@@ -84,27 +107,22 @@ export class TreeViewComponent implements OnChanges {
     return false;
   }
 
-  isRootNode(node: ITreeNode): boolean {
-    return this._data.value.find(item => item.name === node.name) !== undefined;
+  isRootNode(node: ExampleFlatNode): boolean {
+    return node.level === 0;
   }
 
-  hasChild = (_: number, node: ITreeNode) => !!node.children && node.children.length > 0;
+  private isLeaf(node: ExampleFlatNode): boolean {
+    return node.level !== 0 && !this.treeControl.isExpandable(node);
+  }
 
   handleNavigation(): void {
     if (this.navigationCB) {
       this.navigationCB.emit();
     }
   }
-  private getData(): ITreeNode[] {
-    return this._data.value;
-  }
 
   private getSelectedNode(): ITreeNode | undefined {
     return this.selectedNode.value;
-  }
-
-  private isLeaf(node: ITreeNode): boolean {
-    return !node.children || node.children.length === 0;
   }
 }
 

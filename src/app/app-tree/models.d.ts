@@ -4,6 +4,7 @@ export declare namespace TreeView {
     id?: string,
     expanded?: boolean,
     selected?: boolean,
+    parent?: string,
     children?: ITreeNode[]
   }
 }

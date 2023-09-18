@@ -6,18 +6,23 @@ import {AppTreeService} from "./app-tree/app-tree.service";
 const TREE_DATA: ITreeNode[] = [
   {
     name: 'Fruit',
-    children: [{name: 'Apple'}, {name: 'Banana'}, {name: 'Fruit loops'}],
+    children: [{name: 'Apple', parent: 'Fruit'}, {name: 'Banana', parent: 'Fruit'}, {
+      name: 'Fruit loops',
+      parent: 'Fruit'
+    }],
   },
   {
     name: 'Vegetables',
     children: [
       {
         name: 'Green',
-        children: [{name: 'Broccoli'}, {name: 'Brussels sprouts'}],
+        parent: 'Vegetables',
+        children: [{name: 'Broccoli', parent: 'Green'}, {name: 'Brussels sprouts', parent: 'Green'}],
       },
       {
         name: 'Orange',
-        children: [{name: 'Pumpkins'}, {name: 'Carrots'}],
+        parent: 'Vegetables',
+        children: [{name: 'Pumpkins', parent: 'Orange'}, {name: 'Carrots', parent: 'Orange'}],
       },
     ],
   },
