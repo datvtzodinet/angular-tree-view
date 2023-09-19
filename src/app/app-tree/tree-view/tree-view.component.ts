@@ -49,8 +49,7 @@ export class TreeViewComponent implements OnChanges, AfterViewInit {
   );
 
   constructor(private treeService: AppTreeService) {
-    this.dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
-    this.dataSource.data = this.data;
+    this.dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener, this.data);
   }
 
   ngAfterViewInit(): void {
@@ -67,6 +66,9 @@ export class TreeViewComponent implements OnChanges, AfterViewInit {
     if (data) {
       if (data.currentValue) {
         this.dataSource.data = this.data;
+        if(this.expandAll) {
+            this.treeControl.expandAll();
+        }
       } else {
         this.dataSource.data = [];
       }

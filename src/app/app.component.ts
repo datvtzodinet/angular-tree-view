@@ -35,13 +35,20 @@ const TREE_DATA: ITreeNode[] = [
 })
 export class AppComponent {
   title = 'untitled';
-  dataSource: ITreeNode[] = TREE_DATA;
+  dataSource: ITreeNode[] = [];
   includeSubUnits: boolean = true;
 
   constructor(private treeService: AppTreeService) {
     this.treeService.getSelectedUnit().subscribe((unit: string | undefined) => {
       console.log('selected node:', unit);
     });
+
+    setTimeout(() => {
+        this.dataSource = TREE_DATA;
+    }, 3000);
+    setTimeout(() => {
+        this.dataSource = [...TREE_DATA, ...TREE_DATA];
+    }, 6000);
   }
 
   handleNavigation = (): void => {
